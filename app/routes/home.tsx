@@ -1,4 +1,9 @@
+import { Navbar } from "@/features/home/components/Navbar";
 import type { Route } from "./+types/home";
+import { Hero } from "@/features/home/components/Hero";
+import { Features } from "@/features/home/components/Features";
+import { Pricing } from "@/features/home/components/Pricing";
+import { Footer } from "@/features/home/components/Footer";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -8,5 +13,13 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  return <h1>test</h1>;
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <Hero />
+      <Features />
+      <Pricing />
+      <Footer />
+    </div>
+  );
 }
