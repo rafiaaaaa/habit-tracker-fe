@@ -49,7 +49,7 @@ export function Features() {
   return (
     <section className="py-24 relative" id="features">
       {/* Background accent */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-secondary/5 to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-b from-transparent via-secondary/5 to-transparent" />
 
       <div className="container relative z-10 px-4">
         <div className="text-center mb-16">
