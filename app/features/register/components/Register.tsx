@@ -3,56 +3,44 @@ import { NavLink, useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Zap, Eye, EyeOff, Check } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { Zap, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { registerUserSchema, useRegisterUser } from "../api/registerUser";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function Register() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [honeypot, setHoneypot] = useState(""); // Bot protection
-  const { register, isLoading } = useAuth();
+  const [honeypot, setHoneypot] = useState("");
   const navigate = useNavigate();
 
-  const passwordStrength = {
-    length: password.length >= 8,
-    hasNumber: /\d/.test(password),
-    hasSpecial: /[!@#$%^&*]/.test(password),
-  };
+  const {
+    register: registerForm,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(registerUserSchema),
+  });
 
-  const isPasswordStrong =
-    passwordStrength.length && passwordStrength.hasNumber;
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Honeypot check
+  const onSubmit = handleSubmit((data) => {
     if (honeypot) {
-      return; // Bot detected
-    }
-
-    // Validation
-    if (!name || !email || !password) {
-      toast.error("Please fill in all fields");
       return;
     }
+    registerUserMutation(data);
+  });
 
-    if (!isPasswordStrong) {
-      toast.error("Password must be at least 8 characters with a number");
-      return;
-    }
-
-    const result = await register(email, password, name);
-
-    if (result.success) {
-      toast.success("Account created successfully!");
-      navigate("/dashboard");
-    } else {
-      toast.error(result.error || "Registration failed");
-    }
-  };
+  const { mutate: registerUserMutation, isPending: isRegisterUserPending } =
+    useRegisterUser({
+      mutationConfig: {
+        onSuccess: () => {
+          toast.success("Account created successfully!");
+          navigate("/dashboard");
+        },
+        onError: (err) => {
+          toast.error("Registration failed" + err.message);
+        },
+      },
+    });
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
@@ -81,7 +69,7 @@ export default function Register() {
             Start building better habits today
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={onSubmit} className="space-y-4">
             {/* Honeypot field - hidden from users */}
             <input
               type="text"
@@ -99,12 +87,13 @@ export default function Register() {
                 id="name"
                 type="text"
                 placeholder="John Doe"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
                 autoComplete="name"
                 maxLength={100}
+                {...registerForm("name", { required: true })}
               />
+              {errors.name && (
+                <p className="text-red-500 text-sm">{errors.name.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -113,72 +102,37 @@ export default function Register() {
                 id="email"
                 type="email"
                 placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
                 autoComplete="email"
                 maxLength={255}
+                {...registerForm("email", { required: true })}
               />
+              {errors.name && (
+                <p className="text-red-500 text-sm">{errors.email?.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  autoComplete="new-password"
-                  className="pr-10"
+                <InputPassword
+                  {...registerForm("password", { required: true })}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-4 h-4" />
-                  ) : (
-                    <Eye className="w-4 h-4" />
-                  )}
-                </button>
               </div>
-
-              {/* Password strength indicators */}
-              {password && (
-                <div className="space-y-1 pt-2">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Check
-                      className={`w-4 h-4 ${passwordStrength.length ? "text-success" : "text-muted-foreground"}`}
-                    />
-                    <span
-                      className={
-                        passwordStrength.length
-                          ? "text-success"
-                          : "text-muted-foreground"
-                      }
-                    >
-                      At least 8 characters
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Check
-                      className={`w-4 h-4 ${passwordStrength.hasNumber ? "text-success" : "text-muted-foreground"}`}
-                    />
-                    <span
-                      className={
-                        passwordStrength.hasNumber
-                          ? "text-success"
-                          : "text-muted-foreground"
-                      }
-                    >
-                      Contains a number
-                    </span>
-                  </div>
-                </div>
+              {errors.name && (
+                <p className="text-red-500 text-sm">
+                  {errors.password?.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Confirm Password</Label>
+              <InputPassword
+                {...registerForm("confirmPassword", { required: true })}
+              />
+              {errors.name && (
+                <p className="text-red-500 text-sm">
+                  {errors.confirmPassword?.message}
+                </p>
               )}
             </div>
 
@@ -187,9 +141,16 @@ export default function Register() {
               variant="glow"
               size="lg"
               className="w-full"
-              disabled={isLoading || !isPasswordStrong}
+              disabled={isRegisterUserPending}
             >
-              {isLoading ? "Creating account..." : "Create Account"}
+              {isRegisterUserPending ? (
+                <>
+                  <Loader2 className="animate-spin" />
+                  <span>Creating account...</span>
+                </>
+              ) : (
+                "Create Account"
+              )}
             </Button>
           </form>
 
@@ -204,3 +165,32 @@ export default function Register() {
     </div>
   );
 }
+
+const InputPassword = (props: any) => {
+  const [showPassword, setShowPassword] = useState(false);
+  return (
+    <>
+      <div className="relative">
+        <Input
+          id="password"
+          type={showPassword ? "text" : "password"}
+          placeholder="••••••••"
+          autoComplete="new-password"
+          className="pr-10"
+          {...props}
+        />
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+        >
+          {showPassword ? (
+            <EyeOff className="w-4 h-4" />
+          ) : (
+            <Eye className="w-4 h-4" />
+          )}
+        </button>
+      </div>
+    </>
+  );
+};

@@ -11,6 +11,7 @@ import type { Route } from "./+types/root";
 import "./app.css";
 
 import { Toaster as Sonner } from "./components/ui/sonner";
+import QueryProvider from "./components/providers/QueryProvider";
 
 // export const links: Route.LinksFunction = () => [
 //   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -28,20 +29,25 @@ import { Toaster as Sonner } from "./components/ui/sonner";
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <Sonner />
-      <html lang="en">
-        <head>
-          <meta charSet="utf-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <Meta />
-          <Links />
-        </head>
-        <body>
-          {children}
-          <ScrollRestoration />
-          <Scripts />
-        </body>
-      </html>
+      <QueryProvider>
+        <Sonner />
+        <html lang="en">
+          <head>
+            <meta charSet="utf-8" />
+            <meta
+              name="viewport"
+              content="width=device-width, initial-scale=1"
+            />
+            <Meta />
+            <Links />
+          </head>
+          <body>
+            {children}
+            <ScrollRestoration />
+            <Scripts />
+          </body>
+        </html>
+      </QueryProvider>
     </>
   );
 }
