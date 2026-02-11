@@ -1,8 +1,8 @@
 {
     "rewrites": [
       {
-        "source": "/api/(.*)",
-        "destination": "https://habit-tracker-be-pi.vercel.app"
+        "source": "/api/:path*",
+        "destination": "https://habit-tracker-be-pi.vercel.app/:path*"
       }
     ]
   }
