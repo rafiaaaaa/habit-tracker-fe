@@ -9,6 +9,13 @@ export default defineConfig(({ mode }) => {
     plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
     server: {
       allowedHosts: env.VITE_ALLOWED_HOSTS!.split(","),
+      proxy: {
+        "/api": {
+        target: env.VITE_API_URL!,
+        changeOrigin: true,
+        secure: true,
+        },
       },
+    },
   };
 });
