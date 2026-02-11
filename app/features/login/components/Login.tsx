@@ -3,41 +3,42 @@ import { NavLink, useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Zap, Eye, EyeOff } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { Zap, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { loginUserSchema, useLoginUser } from "../api/loginUser";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [honeypot, setHoneypot] = useState("");
-  const { login, isLoading } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(loginUserSchema),
+  });
 
-    // Honeypot check
-    if (honeypot) {
-      return; // Bot detected
-    }
+  const onSubmit = handleSubmit((data) => {
+    if (honeypot) return;
+    loginUserMutation(data);
+  });
 
-    // Basic validation
-    if (!email || !password) {
-      toast.error("Please fill in all fields");
-      return;
-    }
-
-    const result = await login(email, password);
-
-    if (result.success) {
-      toast.success("Welcome back!");
-      navigate("/dashboard");
-    } else {
-      toast.error(result.error || "Login failed");
-    }
-  };
+  const { mutate: loginUserMutation, isPending: loginUserIsPending } =
+    useLoginUser({
+      mutationConfig: {
+        onSuccess: () => {
+          toast.success("Welcome back!");
+          navigate("/dashboard");
+        },
+        onError: (err) => {
+          toast.error("Login failed" + err.message);
+        },
+      },
+    });
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
@@ -64,7 +65,7 @@ export default function Login() {
             Sign in to continue your habit journey
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={onSubmit} className="space-y-4">
             {/* Honeypot field - hidden from users */}
             <input
               type="text"
@@ -82,11 +83,13 @@ export default function Login() {
                 id="email"
                 type="email"
                 placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
+                {...register("email")}
               />
+              {errors.email && (
+                <p className="text-sm text-red-500">{errors.email.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -96,11 +99,10 @@ export default function Login() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
                   className="pr-10"
+                  {...register("password")}
                 />
                 <button
                   type="button"
@@ -114,6 +116,11 @@ export default function Login() {
                   )}
                 </button>
               </div>
+              {errors.password && (
+                <p className="text-sm text-red-500">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
 
             <Button
@@ -121,9 +128,16 @@ export default function Login() {
               variant="glow"
               size="lg"
               className="w-full"
-              disabled={isLoading}
+              disabled={loginUserIsPending}
             >
-              {isLoading ? "Signing in..." : "Sign In"}
+              {loginUserIsPending ? (
+                <>
+                  <Loader2 className="animate-spin" />
+                  <span>Signing in...</span>
+                </>
+              ) : (
+                "Sign In"
+              )}
             </Button>
           </form>
 
