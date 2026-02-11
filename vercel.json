@@ -2,7 +2,7 @@
     "rewrites": [
       {
         "source": "/api/:path*",
-        "destination": "https://habit-tracker-be-pi.vercel.app/:path*"
+        "destination": "https://habit-tracker-be-pi.vercel.app/api/:path*"
       }
     ]
   }
