@@ -24,7 +24,7 @@ export function WeeklyChart({ stats }: WeeklyChartProps) {
     <div className="glass rounded-xl p-6">
       <h3 className="font-semibold text-lg mb-4">Weekly Progress</h3>
       <div className="h-48">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height={192}>
           <BarChart data={data}>
             <XAxis
               dataKey="day"
