@@ -10,6 +10,7 @@ export const registerUserSchema = z
     email: z.email(),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string(),
+    timezone: z.string().default("UTC").optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -19,6 +20,7 @@ export const registerUserSchema = z
 export type RegisterUserSchema = z.infer<typeof registerUserSchema>;
 
 export const registerUser = async (params: RegisterUserSchema) => {
+  params.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const response = await axiosInstance.post("/auth/register", params);
 
   return response.data;

@@ -6,11 +6,13 @@ import z from "zod";
 export const loginUserSchema = z.object({
   email: z.email(),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  timezone: z.string().default("UTC").optional(),
 });
 
 type LoginUserSchema = z.infer<typeof loginUserSchema>;
 
 export const loginUser = async (payload: LoginUserSchema) => {
+  payload.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const response = await axiosInstance.post("/auth/login", payload);
 
   return response.data;
