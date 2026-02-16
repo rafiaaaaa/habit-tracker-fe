@@ -25,6 +25,8 @@ export default function Dashboard() {
     // deleteHabit,
     // getHabitStats,
     // canAddHabit,
+    habitDialog,
+    setHabitDialog,
   } = useHabits();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -147,15 +149,15 @@ export default function Dashboard() {
             onToggle={handleToggle}
             onEdit={handleEditHabit}
             onDelete={handleDeleteHabit}
-            onCreateClick={() => setShowCreateModal(true)}
+            onCreateClick={() => setHabitDialog("create")}
           />
         </div>
       </main>
 
       {/* Create habit modal */}
       <CreateHabitModal
-        open={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
+        open={habitDialog == "create"}
+        onClose={() => setHabitDialog(null)}
         onSubmit={handleCreateHabit}
         // canCreate={canAddHabit(user.plan)}
       />

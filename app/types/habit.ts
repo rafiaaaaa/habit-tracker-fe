@@ -1,14 +1,14 @@
-export type Frequency = "daily" | "weekly" | "custom";
+export type Frequency = "DAILY" | "WEEKLY" | "CUSTOM";
 
 export type Category =
-  | "health"
-  | "fitness"
-  | "productivity"
-  | "learning"
-  | "mindfulness"
-  | "social"
-  | "finance"
-  | "other";
+  | "HEALTH"
+  | "FITNESS"
+  | "PRODUCTIVITY"
+  | "LEARNING"
+  | "MINDFULNESS"
+  | "SOCIAL"
+  | "FINANCE"
+  | "OTHER";
 
 export interface Habit {
   id: string;
@@ -60,23 +60,23 @@ export const PLAN_LIMITS: Record<PlanType, PlanLimits> = {
 };
 
 export const CATEGORY_COLORS: Record<Category, string> = {
-  health: "hsl(142, 76%, 46%)",
-  fitness: "hsl(199, 89%, 48%)",
-  productivity: "hsl(174, 72%, 56%)",
-  learning: "hsl(262, 83%, 58%)",
-  mindfulness: "hsl(316, 72%, 52%)",
-  social: "hsl(38, 92%, 50%)",
-  finance: "hsl(47, 95%, 53%)",
-  other: "hsl(215, 20%, 55%)",
+  HEALTH: "hsl(142, 76%, 46%)",
+  FITNESS: "hsl(199, 89%, 48%)",
+  PRODUCTIVITY: "hsl(174, 72%, 56%)",
+  LEARNING: "hsl(262, 83%, 58%)",
+  MINDFULNESS: "hsl(316, 72%, 52%)",
+  SOCIAL: "hsl(38, 92%, 50%)",
+  FINANCE: "hsl(47, 95%, 53%)",
+  OTHER: "hsl(215, 20%, 55%)",
 };
 
 export const CATEGORY_ICONS: Record<Category, string> = {
-  health: "🏥",
-  fitness: "💪",
-  productivity: "⚡",
-  learning: "📚",
-  mindfulness: "🧘",
-  social: "👥",
-  finance: "💰",
-  other: "📌",
+  HEALTH: "🏥",
+  FITNESS: "💪",
+  PRODUCTIVITY: "⚡",
+  LEARNING: "📚",
+  MINDFULNESS: "🧘",
+  SOCIAL: "👥",
+  FINANCE: "💰",
+  OTHER: "📌",
 };

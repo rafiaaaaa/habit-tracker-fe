@@ -4,23 +4,7 @@ import { PLAN_LIMITS } from "@/types/habit";
 import { getHabitsQueryKey, useGetHabits } from "../api/getHabits";
 import { useToggleCompleteHabit } from "../api/toggleCompleteHabit";
 import queryClient from "@/lib/query-client";
-
-const mockHabits: Habit[] = [
-  {
-    id: "1",
-    title: "Morning Meditation",
-    category: "mindfulness",
-    frequency: "daily",
-    streak: 12,
-    longestStreak: 21,
-    habitRecords: {
-      "2026-02-07": true,
-    },
-    todayCompleted: true,
-    createdAt: "2026-01-01T00:00:00Z",
-    updatedAt: "2026-02-07T00:00:00Z",
-  },
-];
+import { useCreateHabit, type CreateHabitRequest } from "../api/createHabits";
 
 interface UseHabitsReturn {
   habits: Habit[];
@@ -29,6 +13,10 @@ interface UseHabitsReturn {
   canAddHabit: (plan: PlanType) => boolean;
   toggleHabitCompletion: (habitId: string) => void;
   isToggleCompleteHabitLoading: boolean;
+  createHabit: (params: CreateHabitRequest) => void;
+  isCreateHabitLoading: boolean;
+  habitDialog: "create" | "edit" | null;
+  setHabitDialog: (dialog: "create" | "edit" | null) => void;
 }
 
 export interface HabitStats {
@@ -47,6 +35,9 @@ export interface HabitStats {
 
 export function useHabits(): UseHabitsReturn {
   const [isLoading] = useState(false);
+  const [habitDialog, setHabitDialog] = useState<"create" | "edit" | null>(
+    null,
+  );
 
   const {
     data: habits = [],
@@ -83,6 +74,9 @@ export function useHabits(): UseHabitsReturn {
     },
   });
 
+  const { mutate: createHabitMutation, isPending: isCreateHabitLoading } =
+    useCreateHabit();
+
   const canAddHabit = useCallback(
     (plan: PlanType) => {
       const limits = PLAN_LIMITS[plan];
@@ -90,6 +84,10 @@ export function useHabits(): UseHabitsReturn {
     },
     [habits.length],
   );
+
+  const createHabit = (params: CreateHabitRequest) => {
+    createHabitMutation(params);
+  };
 
   const toggleHabitCompletion = (habitId: string) => {
     toggleCompleteHabitMutation(habitId);
@@ -102,5 +100,9 @@ export function useHabits(): UseHabitsReturn {
     canAddHabit,
     toggleHabitCompletion,
     isToggleCompleteHabitLoading,
+    createHabit,
+    isCreateHabitLoading,
+    habitDialog,
+    setHabitDialog,
   };
 }
