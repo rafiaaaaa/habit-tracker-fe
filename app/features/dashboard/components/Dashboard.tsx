@@ -17,22 +17,21 @@ import { useGetHabits } from "../api/getHabits";
 export default function Dashboard() {
   const { user, logout } = useAuth();
   const {
-    // habits,
-    toggleHabitCompletion,
-    addHabit,
-    updateHabit,
-    deleteHabit,
-    getHabitStats,
-    canAddHabit,
+    habits,
+    isHabitsLoading,
+    // toggleHabitCompletion,
+    // addHabit,
+    // updateHabit,
+    // deleteHabit,
+    // getHabitStats,
+    // canAddHabit,
   } = useHabits();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
-  const stats = getHabitStats();
+  // const stats = getHabitStats();
   const isPro = user?.plan === "pro";
-
-  const { data: habits, isPending: isHabitsLoading, error } = useGetHabits();
 
   if (isHabitsLoading) {
     return <div>Loading...</div>;
@@ -44,28 +43,26 @@ export default function Dashboard() {
   };
 
   const handleToggle = async (id: string, date: string) => {
-    const result = await toggleHabitCompletion(id, date);
-    if (result.success) {
-      toast.success("Habit updated!");
-    }
+    // const result = await toggleHabitCompletion(id, date);
+    // if (result.success) {
+    //   toast.success("Habit updated!");
+    // }
   };
 
-  const handleCreateHabit = async (
-    habitData: Parameters<typeof addHabit>[0],
-  ) => {
-    const result = await addHabit(habitData);
-    if (result.success) {
-      toast.success("Habit created!");
-    } else {
-      toast.error(result.error || "Failed to create habit");
-    }
+  const handleCreateHabit = async (habitData: any) => {
+    // const result = await addHabit(habitData);
+    // if (result.success) {
+    //   toast.success("Habit created!");
+    // } else {
+    //   toast.error(result.error || "Failed to create habit");
+    // }
   };
 
   const handleDeleteHabit = async (id: string) => {
-    const result = await deleteHabit(id);
-    if (result.success) {
-      toast.success("Habit deleted");
-    }
+    // const result = await deleteHabit(id);
+    // if (result.success) {
+    //   toast.success("Habit deleted");
+    // }
   };
 
   const handleEditHabit = async (
@@ -77,10 +74,10 @@ export default function Dashboard() {
       customDays?: number[];
     },
   ) => {
-    const result = await updateHabit(id, data);
-    if (result.success) {
-      toast.success("Habit updated!");
-    }
+    // const result = await updateHabit(id, data);
+    // if (result.success) {
+    //   toast.success("Habit updated!");
+    // }
   };
 
   if (!user) {
@@ -129,20 +126,19 @@ export default function Dashboard() {
               Good {getTimeOfDay()}, {user.name.split(" ")[0]}! 👋
             </h1>
             <p className="text-muted-foreground">
-              {stats.completedToday === stats.totalHabits &&
-              stats.totalHabits > 0
+              {true
                 ? "You've completed all habits today! 🎉"
-                : `You have ${stats.pendingToday} habits left today`}
+                : `You have 3 habits left today`}
             </p>
           </div>
 
           {/* Stats */}
-          <StatsCards stats={stats} />
+          {/* <StatsCards stats={stats} /> */}
 
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <WeeklyChart stats={stats} />
-            <CategoryChart stats={stats} isPro={isPro} />
+            {/* <WeeklyChart stats={stats} />
+            <CategoryChart stats={stats} isPro={isPro} /> */}
           </div>
 
           {/* Habits section with filters */}
@@ -161,7 +157,7 @@ export default function Dashboard() {
         open={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onSubmit={handleCreateHabit}
-        canCreate={canAddHabit(user.plan)}
+        // canCreate={canAddHabit(user.plan)}
       />
     </div>
   );

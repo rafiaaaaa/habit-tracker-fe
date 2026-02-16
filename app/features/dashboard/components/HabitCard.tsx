@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { formatLocalDate } from "@/utils/date";
 import { useToggleCompleteHabit } from "../api/toggleCompleteHabit";
+import { useHabits } from "../hooks/useHabits";
 
 interface HabitCardProps {
   habit: Habit;
@@ -30,6 +31,8 @@ export function HabitCard({
   const categoryColor = CATEGORY_COLORS[habit.category];
   const categoryIcon = CATEGORY_ICONS[habit.category];
 
+  const { toggleHabitCompletion, isToggleCompleteHabitLoading } = useHabits();
+
   // Get last 7 days for mini calendar
   const last7Days = Array.from({ length: 7 }, (_, i) => {
     const date = new Date();
@@ -38,21 +41,6 @@ export function HabitCard({
 
     return formatLocalDate(date);
   });
-
-  const {
-    mutate: toggleCompleteHabitMutation,
-    isPending: isToggleCompleteHabitLoading,
-  } = useToggleCompleteHabit({
-    mutationConfig: {
-      onMutate: () => {
-        habit.habitRecords[today] = !isCompletedToday;
-      },
-    },
-  });
-
-  const handleToggle = (habitId: string) => {
-    toggleCompleteHabitMutation(habitId);
-  };
 
   return (
     <div className="glass rounded-2xl p-5 hover:glow-primary-sm transition-all duration-300">
@@ -136,7 +124,7 @@ export function HabitCard({
         variant={isCompletedToday ? "default" : "outline"}
         className="w-full"
         disabled={isToggleCompleteHabitLoading}
-        onClick={() => handleToggle(habit.id)}
+        onClick={() => toggleHabitCompletion(habit.id)}
       >
         {isCompletedToday ? (
           <>

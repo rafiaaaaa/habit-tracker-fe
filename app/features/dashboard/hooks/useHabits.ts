@@ -1,7 +1,9 @@
 import { useState, useCallback } from "react";
 import type { Habit, Category, PlanType } from "@/types/habit";
 import { PLAN_LIMITS } from "@/types/habit";
-import { useGetHabits } from "../api/getHabits";
+import { getHabitsQueryKey, useGetHabits } from "../api/getHabits";
+import { useToggleCompleteHabit } from "../api/toggleCompleteHabit";
+import queryClient from "@/lib/query-client";
 
 const mockHabits: Habit[] = [
   {
@@ -23,23 +25,10 @@ const mockHabits: Habit[] = [
 interface UseHabitsReturn {
   habits: Habit[];
   isLoading: boolean;
-  addHabit: (
-    habit: Omit<
-      Habit,
-      "id" | "streak" | "longestStreak" | "history" | "createdAt" | "updatedAt"
-    >,
-  ) => Promise<{ success: boolean; error?: string }>;
-  updateHabit: (
-    id: string,
-    updates: Partial<Habit>,
-  ) => Promise<{ success: boolean; error?: string }>;
-  deleteHabit: (id: string) => Promise<{ success: boolean; error?: string }>;
-  toggleHabitCompletion: (
-    id: string,
-    date: string,
-  ) => Promise<{ success: boolean; error?: string }>;
-  getHabitStats: () => HabitStats;
+  isHabitsLoading: boolean;
   canAddHabit: (plan: PlanType) => boolean;
+  toggleHabitCompletion: (habitId: string) => void;
+  isToggleCompleteHabitLoading: boolean;
 }
 
 export interface HabitStats {
@@ -57,8 +46,42 @@ export interface HabitStats {
 }
 
 export function useHabits(): UseHabitsReturn {
-  const [habits, setHabits] = useState<Habit[]>(mockHabits);
   const [isLoading] = useState(false);
+
+  const {
+    data: habits = [],
+    isPending: isHabitsLoading,
+    error,
+  } = useGetHabits();
+
+  const {
+    mutate: toggleCompleteHabitMutation,
+    isPending: isToggleCompleteHabitLoading,
+  } = useToggleCompleteHabit({
+    mutationConfig: {
+      onMutate: async (habitId: string) => {
+        const today = new Date().toISOString().split("T")[0];
+
+        queryClient.setQueryData(getHabitsQueryKey(), (old: Habit[]) => {
+          if (!old) return old;
+
+          return old.map((habit) => {
+            if (habit.id !== habitId) return habit;
+
+            const isCompleteToday = habit.habitRecords?.[today] ?? false;
+
+            return {
+              ...habit,
+              habitRecords: {
+                ...habit.habitRecords,
+                [today]: !isCompleteToday,
+              },
+            };
+          });
+        });
+      },
+    },
+  });
 
   const canAddHabit = useCallback(
     (plan: PlanType) => {
@@ -68,202 +91,16 @@ export function useHabits(): UseHabitsReturn {
     [habits.length],
   );
 
-  const addHabit = useCallback(
-    async (
-      habitData: Omit<
-        Habit,
-        | "id"
-        | "streak"
-        | "longestStreak"
-        | "history"
-        | "createdAt"
-        | "updatedAt"
-      >,
-    ): Promise<{ success: boolean; error?: string }> => {
-      const now = new Date().toISOString();
-      const newHabit: Habit = {
-        ...habitData,
-        id: Math.random().toString(36).substr(2, 9),
-        streak: 0,
-        longestStreak: 0,
-        history: [],
-        createdAt: now,
-        updatedAt: now,
-      };
-
-      setHabits((prev) => [...prev, newHabit]);
-      return { success: true };
-    },
-    [],
-  );
-
-  const updateHabit = useCallback(
-    async (
-      id: string,
-      updates: Partial<Habit>,
-    ): Promise<{ success: boolean; error?: string }> => {
-      setHabits((prev) =>
-        prev.map((habit) =>
-          habit.id === id
-            ? { ...habit, ...updates, updatedAt: new Date().toISOString() }
-            : habit,
-        ),
-      );
-      return { success: true };
-    },
-    [],
-  );
-
-  const deleteHabit = useCallback(
-    async (id: string): Promise<{ success: boolean; error?: string }> => {
-      setHabits((prev) => prev.filter((habit) => habit.id !== id));
-      return { success: true };
-    },
-    [],
-  );
-
-  const toggleHabitCompletion = useCallback(
-    async (
-      id: string,
-      date: string,
-    ): Promise<{ success: boolean; error?: string }> => {
-      // setHabits((prev) =>
-      //   prev.map((habit) => {
-      //     if (habit.id !== id) return habit;
-
-      //     const existingIndex = habit.history.findIndex((h) => h.date === date);
-      //     let newHistory = [...habit.history];
-
-      //     if (existingIndex >= 0) {
-      //       newHistory[existingIndex] = {
-      //         ...newHistory[existingIndex],
-      //         completed: !newHistory[existingIndex].completed,
-      //       };
-      //     } else {
-      //       newHistory.push({ date, completed: true });
-      //     }
-
-      //     // Sort history by date descending
-      //     newHistory.sort(
-      //       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-      //     );
-
-      //     // Recalculate streak
-      //     let streak = 0;
-      //     const today = new Date().toISOString().split("T")[0];
-      //     let currentDate = new Date(today);
-
-      //     for (let i = 0; i < 365; i++) {
-      //       const dateStr = currentDate.toISOString().split("T")[0];
-      //       const entry = newHistory.find((h) => h.date === dateStr);
-
-      //       if (entry?.completed) {
-      //         streak++;
-      //         currentDate.setDate(currentDate.getDate() - 1);
-      //       } else if (dateStr === today && !entry?.completed) {
-      //         // Today not completed yet, continue checking
-      //         currentDate.setDate(currentDate.getDate() - 1);
-      //       } else {
-      //         break;
-      //       }
-      //     }
-
-      //     return {
-      //       ...habit,
-      //       history: newHistory,
-      //       streak,
-      //       longestStreak: Math.max(habit.longestStreak, streak),
-      //       updatedAt: new Date().toISOString(),
-      //     };
-      //   }),
-      // );
-
-      return { success: true };
-    },
-    [],
-  );
-
-  const getHabitStats = useCallback((): HabitStats => {
-    const today = new Date().toISOString().split("T")[0];
-
-    const completedToday = habits.filter((h) =>
-      h.history.find((entry) => entry.date === today && entry.completed),
-    ).length;
-
-    const pendingToday = habits.length - completedToday;
-
-    const totalStreak = habits.reduce((sum, h) => sum + h.streak, 0);
-
-    // Calculate weekly progress
-    const weeklyProgress = [];
-    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      const dateStr = date.toISOString().split("T")[0];
-      const dayName = dayNames[date.getDay()];
-
-      const completed = habits.filter((h) =>
-        h.history.find((entry) => entry.date === dateStr && entry.completed),
-      ).length;
-
-      weeklyProgress.push({
-        day: dayName,
-        completed,
-        total: habits.length,
-      });
-    }
-
-    // Calculate category breakdown
-    const categoryCount: Record<Category, number> = {} as Record<
-      Category,
-      number
-    >;
-    habits.forEach((h) => {
-      categoryCount[h.category] = (categoryCount[h.category] || 0) + 1;
-    });
-
-    const categoryBreakdown = Object.entries(categoryCount).map(
-      ([category, count]) => ({
-        category: category as Category,
-        count,
-        percentage:
-          habits.length > 0 ? Math.round((count / habits.length) * 100) : 0,
-      }),
-    );
-
-    // Calculate average completion rate
-    const totalCompletions = habits.reduce((sum, h) => {
-      const completed = h.history.filter((entry) => entry.completed).length;
-      return sum + completed;
-    }, 0);
-
-    const totalPossible = habits.reduce((sum, h) => sum + h.history.length, 0);
-    const averageCompletion =
-      totalPossible > 0
-        ? Math.round((totalCompletions / totalPossible) * 100)
-        : 0;
-
-    return {
-      totalHabits: habits.length,
-      completedToday,
-      pendingToday,
-      totalStreak,
-      averageCompletion,
-      weeklyProgress,
-      categoryBreakdown,
-    };
-  }, [habits]);
+  const toggleHabitCompletion = (habitId: string) => {
+    toggleCompleteHabitMutation(habitId);
+  };
 
   return {
     habits,
+    isHabitsLoading,
     isLoading,
-    addHabit,
-    updateHabit,
-    deleteHabit,
-    toggleHabitCompletion,
-    getHabitStats,
     canAddHabit,
+    toggleHabitCompletion,
+    isToggleCompleteHabitLoading,
   };
 }

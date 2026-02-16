@@ -27,7 +27,7 @@ interface CreateHabitModalProps {
     frequency: Frequency;
     customDays?: number[];
   }) => Promise<void>;
-  canCreate: boolean;
+  // canCreate: boolean;
 }
 
 const categories: { value: Category; label: string }[] = [
@@ -61,7 +61,7 @@ export function CreateHabitModal({
   open,
   onClose,
   onSubmit,
-  canCreate,
+  // canCreate,
 }: CreateHabitModalProps) {
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState<Category>("health");
@@ -71,7 +71,7 @@ export function CreateHabitModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !canCreate) return;
+    if (!title.trim()) return;
 
     setIsSubmitting(true);
     await onSubmit({
@@ -103,7 +103,7 @@ export function CreateHabitModal({
           <DialogTitle>Create New Habit</DialogTitle>
         </DialogHeader>
 
-        {!canCreate ? (
+        {false ? (
           <div className="text-center py-4">
             <p className="text-muted-foreground mb-4">
               You've reached the habit limit on the free plan.
