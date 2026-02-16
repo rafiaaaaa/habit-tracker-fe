@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import type { Habit, Category, PlanType } from "@/types/habit";
 import { PLAN_LIMITS } from "@/types/habit";
+import { useGetHabits } from "../api/getHabits";
 
 const mockHabits: Habit[] = [
   {
@@ -10,62 +11,11 @@ const mockHabits: Habit[] = [
     frequency: "daily",
     streak: 12,
     longestStreak: 21,
-    history: [
-      { date: "2026-02-07", completed: true },
-      { date: "2026-02-06", completed: true },
-      { date: "2026-02-05", completed: true },
-      { date: "2026-02-04", completed: false },
-      { date: "2026-02-03", completed: true },
-    ],
+    habitRecords: {
+      "2026-02-07": true,
+    },
+    todayCompleted: true,
     createdAt: "2026-01-01T00:00:00Z",
-    updatedAt: "2026-02-07T00:00:00Z",
-  },
-  {
-    id: "2",
-    title: "Read 30 minutes",
-    category: "learning",
-    frequency: "daily",
-    streak: 5,
-    longestStreak: 14,
-    history: [
-      { date: "2026-02-07", completed: false },
-      { date: "2026-02-06", completed: true },
-      { date: "2026-02-05", completed: true },
-      { date: "2026-02-04", completed: true },
-      { date: "2026-02-03", completed: true },
-    ],
-    createdAt: "2026-01-15T00:00:00Z",
-    updatedAt: "2026-02-07T00:00:00Z",
-  },
-  {
-    id: "3",
-    title: "Gym Workout",
-    category: "fitness",
-    frequency: "weekly",
-    customDays: [1, 3, 5], // Mon, Wed, Fri
-    streak: 8,
-    longestStreak: 8,
-    history: [
-      { date: "2026-02-07", completed: true },
-      { date: "2026-02-05", completed: true },
-      { date: "2026-02-03", completed: true },
-    ],
-    createdAt: "2026-01-20T00:00:00Z",
-    updatedAt: "2026-02-07T00:00:00Z",
-  },
-  {
-    id: "4",
-    title: "Drink 8 glasses of water",
-    category: "health",
-    frequency: "daily",
-    streak: 3,
-    longestStreak: 10,
-    history: [
-      { date: "2026-02-07", completed: true },
-      { date: "2026-02-06", completed: true },
-      { date: "2026-02-05", completed: true },
-    ],
-    createdAt: "2026-01-10T00:00:00Z",
     updatedAt: "2026-02-07T00:00:00Z",
   },
 ];
@@ -177,56 +127,56 @@ export function useHabits(): UseHabitsReturn {
       id: string,
       date: string,
     ): Promise<{ success: boolean; error?: string }> => {
-      setHabits((prev) =>
-        prev.map((habit) => {
-          if (habit.id !== id) return habit;
+      // setHabits((prev) =>
+      //   prev.map((habit) => {
+      //     if (habit.id !== id) return habit;
 
-          const existingIndex = habit.history.findIndex((h) => h.date === date);
-          let newHistory = [...habit.history];
+      //     const existingIndex = habit.history.findIndex((h) => h.date === date);
+      //     let newHistory = [...habit.history];
 
-          if (existingIndex >= 0) {
-            newHistory[existingIndex] = {
-              ...newHistory[existingIndex],
-              completed: !newHistory[existingIndex].completed,
-            };
-          } else {
-            newHistory.push({ date, completed: true });
-          }
+      //     if (existingIndex >= 0) {
+      //       newHistory[existingIndex] = {
+      //         ...newHistory[existingIndex],
+      //         completed: !newHistory[existingIndex].completed,
+      //       };
+      //     } else {
+      //       newHistory.push({ date, completed: true });
+      //     }
 
-          // Sort history by date descending
-          newHistory.sort(
-            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-          );
+      //     // Sort history by date descending
+      //     newHistory.sort(
+      //       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+      //     );
 
-          // Recalculate streak
-          let streak = 0;
-          const today = new Date().toISOString().split("T")[0];
-          let currentDate = new Date(today);
+      //     // Recalculate streak
+      //     let streak = 0;
+      //     const today = new Date().toISOString().split("T")[0];
+      //     let currentDate = new Date(today);
 
-          for (let i = 0; i < 365; i++) {
-            const dateStr = currentDate.toISOString().split("T")[0];
-            const entry = newHistory.find((h) => h.date === dateStr);
+      //     for (let i = 0; i < 365; i++) {
+      //       const dateStr = currentDate.toISOString().split("T")[0];
+      //       const entry = newHistory.find((h) => h.date === dateStr);
 
-            if (entry?.completed) {
-              streak++;
-              currentDate.setDate(currentDate.getDate() - 1);
-            } else if (dateStr === today && !entry?.completed) {
-              // Today not completed yet, continue checking
-              currentDate.setDate(currentDate.getDate() - 1);
-            } else {
-              break;
-            }
-          }
+      //       if (entry?.completed) {
+      //         streak++;
+      //         currentDate.setDate(currentDate.getDate() - 1);
+      //       } else if (dateStr === today && !entry?.completed) {
+      //         // Today not completed yet, continue checking
+      //         currentDate.setDate(currentDate.getDate() - 1);
+      //       } else {
+      //         break;
+      //       }
+      //     }
 
-          return {
-            ...habit,
-            history: newHistory,
-            streak,
-            longestStreak: Math.max(habit.longestStreak, streak),
-            updatedAt: new Date().toISOString(),
-          };
-        }),
-      );
+      //     return {
+      //       ...habit,
+      //       history: newHistory,
+      //       streak,
+      //       longestStreak: Math.max(habit.longestStreak, streak),
+      //       updatedAt: new Date().toISOString(),
+      //     };
+      //   }),
+      // );
 
       return { success: true };
     },

@@ -43,9 +43,7 @@ export function HabitsSection({
 
   // Calculate today's progress
   const todayProgress = useMemo(() => {
-    const completed = habits.filter((h) =>
-      h.history.some((entry) => entry.date === today && entry.completed),
-    ).length;
+    const completed = habits.filter((h) => h.todayCompleted).length;
     return { completed, total: habits.length };
   }, [habits, today]);
 
@@ -67,9 +65,7 @@ export function HabitsSection({
     // Status filter
     if (statusFilter !== "all") {
       result = result.filter((h) => {
-        const isCompleted = h.history.some(
-          (entry) => entry.date === today && entry.completed,
-        );
+        const isCompleted = h.todayCompleted;
         return statusFilter === "completed" ? isCompleted : !isCompleted;
       });
     }

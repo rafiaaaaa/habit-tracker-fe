@@ -10,11 +10,6 @@ export type Category =
   | "finance"
   | "other";
 
-export interface HabitCompletion {
-  date: string; // ISO date string
-  completed: boolean;
-}
-
 export interface Habit {
   id: string;
   title: string;
@@ -23,7 +18,8 @@ export interface Habit {
   customDays?: number[]; // 0-6 for Sunday-Saturday
   streak: number;
   longestStreak: number;
-  history: HabitCompletion[];
+  habitRecords: Record<string, boolean>;
+  todayCompleted: boolean;
   createdAt: string;
   updatedAt: string;
 }

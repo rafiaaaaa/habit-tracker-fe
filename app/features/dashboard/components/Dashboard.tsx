@@ -12,11 +12,12 @@ import { useHabits } from "../hooks/useHabits";
 import { useAuth } from "@/hooks/useAuth";
 import type { Category, Frequency } from "@/types/habit";
 import { toast } from "sonner";
+import { useGetHabits } from "../api/getHabits";
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
   const {
-    habits,
+    // habits,
     toggleHabitCompletion,
     addHabit,
     updateHabit,
@@ -30,6 +31,12 @@ export default function Dashboard() {
 
   const stats = getHabitStats();
   const isPro = user?.plan === "pro";
+
+  const { data: habits, isPending: isHabitsLoading, error } = useGetHabits();
+
+  if (isHabitsLoading) {
+    return <div>Loading...</div>;
+  }
 
   const handleLogout = async () => {
     await logout();

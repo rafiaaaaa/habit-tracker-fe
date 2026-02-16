@@ -8,6 +8,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { formatLocalDate } from "@/utils/date";
+import { useToggleCompleteHabit } from "../api/toggleCompleteHabit";
 
 interface HabitCardProps {
   habit: Habit;
@@ -23,9 +25,7 @@ export function HabitCard({
   onDelete,
 }: HabitCardProps) {
   const today = new Date().toISOString().split("T")[0];
-  const isCompletedToday = habit.history.find(
-    (entry) => entry.date === today && entry.completed,
-  );
+  const isCompletedToday = habit.habitRecords[today];
 
   const categoryColor = CATEGORY_COLORS[habit.category];
   const categoryIcon = CATEGORY_ICONS[habit.category];
@@ -33,9 +33,26 @@ export function HabitCard({
   // Get last 7 days for mini calendar
   const last7Days = Array.from({ length: 7 }, (_, i) => {
     const date = new Date();
+    date.setHours(0, 0, 0, 0); // normalize
     date.setDate(date.getDate() - (6 - i));
-    return date.toISOString().split("T")[0];
+
+    return formatLocalDate(date);
   });
+
+  const {
+    mutate: toggleCompleteHabitMutation,
+    isPending: isToggleCompleteHabitLoading,
+  } = useToggleCompleteHabit({
+    mutationConfig: {
+      onMutate: () => {
+        habit.habitRecords[today] = !isCompletedToday;
+      },
+    },
+  });
+
+  const handleToggle = (habitId: string) => {
+    toggleCompleteHabitMutation(habitId);
+  };
 
   return (
     <div className="glass rounded-2xl p-5 hover:glow-primary-sm transition-all duration-300">
@@ -93,8 +110,8 @@ export function HabitCard({
       {/* Mini calendar */}
       <div className="flex items-center gap-1.5 mb-4">
         {last7Days.map((date) => {
-          const entry = habit.history.find((h) => h.date === date);
-          const isCompleted = entry?.completed;
+          const entry = habit.habitRecords[date];
+          const isCompleted = entry;
           const isToday = date === today;
 
           return (
@@ -118,7 +135,8 @@ export function HabitCard({
       <Button
         variant={isCompletedToday ? "default" : "outline"}
         className="w-full"
-        onClick={() => onToggle(habit.id, today)}
+        disabled={isToggleCompleteHabitLoading}
+        onClick={() => handleToggle(habit.id)}
       >
         {isCompletedToday ? (
           <>
