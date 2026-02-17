@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Check, X, Sparkles } from "lucide-react";
-import { NavLink } from "react-router";
+import { useCreateSubscription } from "../api/createSubscription";
 
 const plans = [
   {
@@ -42,6 +42,21 @@ const plans = [
 ];
 
 export function Pricing() {
+  const {
+    mutate: createSubscriptionMutation,
+    isPending: createSubscriptionIsLoading,
+  } = useCreateSubscription();
+
+  const handleCreateSubscription = (plan: string) => {
+    createSubscriptionMutation(
+      { plan },
+      {
+        onSuccess: () => {
+          alert("Subscription created successfully");
+        },
+      },
+    );
+  };
   return (
     <section className="py-24 relative" id="pricing">
       <div className="container px-4">
@@ -99,15 +114,15 @@ export function Pricing() {
                 ))}
               </ul>
 
-              <NavLink to="/register" className="block">
-                <Button
-                  variant={plan.popular ? "glow" : "outline"}
-                  size="lg"
-                  className="w-full"
-                >
-                  {plan.cta}
-                </Button>
-              </NavLink>
+              <Button
+                variant={plan.popular ? "glow" : "outline"}
+                size="lg"
+                className="w-full"
+                disabled={createSubscriptionIsLoading}
+                onClick={() => handleCreateSubscription("pro")}
+              >
+                {plan.cta}
+              </Button>
             </div>
           ))}
         </div>
