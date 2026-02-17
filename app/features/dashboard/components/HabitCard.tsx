@@ -9,7 +9,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { formatLocalDate } from "@/utils/date";
-import { useToggleCompleteHabit } from "../api/toggleCompleteHabit";
 import { useHabits } from "../hooks/useHabits";
 
 interface HabitCardProps {
@@ -28,6 +27,7 @@ export function HabitCard({
   const today = new Date().toISOString().split("T")[0];
   const isCompletedToday = habit.habitRecords[today];
 
+  console.log("ini habit", habit.category);
   const categoryColor = CATEGORY_COLORS[habit.category];
   const categoryIcon = CATEGORY_ICONS[habit.category];
 
@@ -45,19 +45,24 @@ export function HabitCard({
   return (
     <div className="glass rounded-2xl p-5 hover:glow-primary-sm transition-all duration-300">
       <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 lowercase">
           <span className="text-2xl">{categoryIcon}</span>
           <div>
             <h3 className="font-semibold text-lg">{habit.title}</h3>
-            <span
-              className="text-xs px-2 py-0.5 rounded-full capitalize"
-              style={{
-                backgroundColor: `${categoryColor}20`,
-                color: categoryColor,
-              }}
-            >
-              {habit.category}
-            </span>
+            <div className="flex gap-2">
+              <span
+                className="text-xs rounded-full capitalize"
+                style={{
+                  backgroundColor: `${categoryColor}20`,
+                  color: categoryColor,
+                }}
+              >
+                {habit.category}
+              </span>
+              <span className="text-muted-foreground text-xs capitalize">
+                {habit.frequency}
+              </span>
+            </div>
           </div>
         </div>
 
