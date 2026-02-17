@@ -21,7 +21,7 @@ import { CATEGORY_ICONS } from "@/types/habit";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createHabitValidationSchema } from "../api/createHabits";
-import { useHabits } from "../hooks/useHabits";
+import { useHabits } from "../context/useHabits";
 
 interface CreateHabitModalProps {
   open: boolean;

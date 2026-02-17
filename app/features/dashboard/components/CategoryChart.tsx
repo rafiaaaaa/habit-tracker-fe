@@ -1,4 +1,4 @@
-import type { HabitStats } from "../hooks/useHabits";
+import type { HabitStats } from "../context/useHabits";
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "@/types/habit";
 import {
   PieChart,

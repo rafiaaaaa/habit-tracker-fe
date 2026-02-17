@@ -8,7 +8,7 @@ import { CreateHabitModal } from "./CreateHabitModal";
 import { HabitsSection } from "./HabitsSection";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
-import { useHabits } from "../hooks/useHabits";
+import { useHabits } from "../context/useHabits";
 import { useAuth } from "@/hooks/useAuth";
 import type { Category, Frequency } from "@/types/habit";
 import { toast } from "sonner";

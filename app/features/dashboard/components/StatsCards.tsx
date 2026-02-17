@@ -1,4 +1,4 @@
-import type { HabitStats } from "../hooks/useHabits";
+import type { HabitStats } from "../context/useHabits";
 import { Target, CheckCircle, Clock, Flame, TrendingUp } from "lucide-react";
 
 interface StatsCardsProps {

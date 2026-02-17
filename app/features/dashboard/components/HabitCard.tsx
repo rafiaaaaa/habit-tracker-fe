@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { formatLocalDate } from "@/utils/date";
-import { useHabits } from "../hooks/useHabits";
+import { useHabits } from "../context/useHabits";
 
 interface HabitCardProps {
   habit: Habit;
@@ -27,11 +27,15 @@ export function HabitCard({
   const today = new Date().toISOString().split("T")[0];
   const isCompletedToday = habit.habitRecords[today];
 
-  console.log("ini habit", habit.category);
   const categoryColor = CATEGORY_COLORS[habit.category];
   const categoryIcon = CATEGORY_ICONS[habit.category];
 
-  const { toggleHabitCompletion, isToggleCompleteHabitLoading } = useHabits();
+  const {
+    toggleHabitCompletion,
+    isToggleCompleteHabitLoading,
+    deleteHabit,
+    isDeleteHabitLoading,
+  } = useHabits();
 
   // Get last 7 days for mini calendar
   const last7Days = Array.from({ length: 7 }, (_, i) => {
@@ -78,7 +82,7 @@ export function HabitCard({
               Edit
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => onDelete(habit.id)}
+              onClick={() => deleteHabit(habit.id)}
               className="text-destructive focus:text-destructive"
             >
               <Trash2 className="w-4 h-4 mr-2" />
