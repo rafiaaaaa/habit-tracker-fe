@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { loginUserSchema, useLoginUser } from "../api/loginUser";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { GoogleLogin } from "@react-oauth/google";
+import { useLoginGoogle } from "../api/loginGoogle";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -40,6 +42,9 @@ export default function Login() {
       },
     });
 
+  const { mutate: loginGoogleMutation, isPending: loginGoogleIsPending } =
+    useLoginGoogle();
+
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
       {/* Background effects */}
@@ -59,12 +64,10 @@ export default function Login() {
             </div>
             <span className="font-bold text-2xl">Habit Tracker</span>
           </NavLink>
-
           <h1 className="text-2xl font-bold text-center mb-2">Welcome back</h1>
           <p className="text-muted-foreground text-center mb-8">
             Sign in to continue your habit journey
           </p>
-
           <form onSubmit={onSubmit} className="space-y-4">
             {/* Honeypot field - hidden from users */}
             <input
@@ -139,6 +142,24 @@ export default function Login() {
                 "Sign In"
               )}
             </Button>
+            <div className="flex justify-center">
+              <GoogleLogin
+                type="icon"
+                shape="circle"
+                theme="filled_blue"
+                width="500"
+                onSuccess={async (credentialResponse) => {
+                  const idToken = credentialResponse.credential;
+                  await loginGoogleMutation(idToken!);
+
+                  navigate("/dashboard");
+                }}
+                onError={() => {
+                  console.log("Login Failed");
+                }}
+                useOneTap
+              />
+            </div>
           </form>
 
           <p className="text-center text-muted-foreground mt-6">

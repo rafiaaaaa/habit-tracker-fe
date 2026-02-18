@@ -12,6 +12,7 @@ import "./app.css";
 
 import { Toaster as Sonner } from "./components/ui/sonner";
 import QueryProvider from "./components/providers/QueryProvider";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 // export const links: Route.LinksFunction = () => [
 //   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -26,28 +27,32 @@ import QueryProvider from "./components/providers/QueryProvider";
 //   },
 // ];
 
+const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID!;
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <QueryProvider>
-        <Sonner />
-        <html lang="en">
-          <head>
-            <meta charSet="utf-8" />
-            <meta
-              name="viewport"
-              content="width=device-width, initial-scale=1"
-            />
-            <Meta />
-            <Links />
-          </head>
-          <body>
-            {children}
-            <ScrollRestoration />
-            <Scripts />
-          </body>
-        </html>
-      </QueryProvider>
+      <GoogleOAuthProvider clientId={clientId} locale="en">
+        <QueryProvider>
+          <Sonner />
+          <html lang="en">
+            <head>
+              <meta charSet="utf-8" />
+              <meta
+                name="viewport"
+                content="width=device-width, initial-scale=1"
+              />
+              <Meta />
+              <Links />
+            </head>
+            <body>
+              {children}
+              <ScrollRestoration />
+              <Scripts />
+            </body>
+          </html>
+        </QueryProvider>
+      </GoogleOAuthProvider>
     </>
   );
 }
