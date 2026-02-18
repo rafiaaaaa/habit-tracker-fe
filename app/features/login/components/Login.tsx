@@ -43,7 +43,14 @@ export default function Login() {
     });
 
   const { mutate: loginGoogleMutation, isPending: loginGoogleIsPending } =
-    useLoginGoogle();
+    useLoginGoogle({
+      mutationConfig: {
+        onSuccess: () => {
+          toast.success("Welcome back!");
+          navigate("/dashboard");
+        },
+      },
+    });
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
@@ -148,11 +155,9 @@ export default function Login() {
                 shape="circle"
                 theme="filled_blue"
                 width="500"
-                onSuccess={async (credentialResponse) => {
+                onSuccess={(credentialResponse) => {
                   const idToken = credentialResponse.credential;
-                  await loginGoogleMutation(idToken!);
-
-                  navigate("/dashboard");
+                  loginGoogleMutation(idToken!);
                 }}
                 onError={() => {
                   console.log("Login Failed");
