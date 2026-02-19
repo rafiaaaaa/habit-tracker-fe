@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/useAuth";
 import { Zap, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { NavLink } from "react-router";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { user } = useAuth();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/50">

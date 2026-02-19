@@ -12,6 +12,7 @@ import { useToggleCompleteHabit } from "../api/toggleCompleteHabit";
 import queryClient from "@/lib/query-client";
 import { useCreateHabit, type CreateHabitRequest } from "../api/createHabits";
 import { useDeleteHabit } from "../api/deleteHabit";
+import { toast } from "sonner";
 
 interface HabitContextValue {
   habits: Habit[];
@@ -87,7 +88,13 @@ export function HabitProvider({ children }: { children: ReactNode }) {
 
   // create
   const { mutate: createHabitMutation, isPending: isCreateHabitLoading } =
-    useCreateHabit();
+    useCreateHabit({
+      mutationConfig: {
+        onError: (err) => {
+          toast.error(err.response?.data?.message || "Failed to create habit");
+        },
+      },
+    });
 
   // delete
   const { mutate: deleteHabitMutation, isPending: isDeleteHabitLoading } =
