@@ -1,6 +1,13 @@
 import type { Habit } from "@/types/habit";
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "@/types/habit";
-import { Check, Flame, MoreVertical, Trash2, Edit2 } from "lucide-react";
+import {
+  Check,
+  Flame,
+  MoreVertical,
+  Trash2,
+  Edit2,
+  Trophy,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -96,14 +103,14 @@ export function HabitCard({
 
       {/* Streak info */}
       <div className="flex items-center gap-4 mb-4">
-        <div className="flex items-center gap-1.5 text-warning">
-          <Flame className="w-4 h-4" />
-          <span className="font-medium">{habit.streak}</span>
-          <span className="text-muted-foreground text-sm">streak</span>
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-warning/10">
+          <Flame className="w-3.5 h-3.5 text-warning" />
+          <span className="text-sm font-bold text-warning">{habit.streak}</span>
         </div>
-        <span className="text-muted-foreground text-sm">
-          Best: {habit.longestStreak}
-        </span>
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-yellow-400 font-extrabold">
+          <Trophy className="w-3 h-3" />
+          <span className="text-xs">{habit.streak}</span>
+        </div>
       </div>
 
       {/* Mini calendar */}
