@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Check, X, Sparkles } from "lucide-react";
-import { useCreateSubscription } from "../api/createSubscription";
+import { useCreatePaymentLink } from "../api/createPaymentLink";
 
 const plans = [
   {
@@ -43,19 +43,17 @@ const plans = [
 
 export function Pricing() {
   const {
-    mutate: createSubscriptionMutation,
-    isPending: createSubscriptionIsLoading,
-  } = useCreateSubscription();
+    mutate: createPaymentLinkMutation,
+    isPending: createPaymentLinkIsLoading,
+  } = useCreatePaymentLink();
 
-  const handleCreateSubscription = (plan: string) => {
-    createSubscriptionMutation(
-      { plan },
-      {
-        onSuccess: () => {
-          alert("Subscription created successfully");
-        },
+  const handleCreateSubscription = () => {
+    createPaymentLinkMutation(undefined, {
+      onSuccess: (data) => {
+        console.log(data);
+        window.location.href = data.url;
       },
-    );
+    });
   };
   return (
     <section className="py-24 relative" id="pricing">
@@ -118,8 +116,8 @@ export function Pricing() {
                 variant={plan.popular ? "glow" : "outline"}
                 size="lg"
                 className="w-full"
-                disabled={createSubscriptionIsLoading}
-                onClick={() => handleCreateSubscription("pro")}
+                disabled={createPaymentLinkIsLoading}
+                onClick={handleCreateSubscription}
               >
                 {plan.cta}
               </Button>

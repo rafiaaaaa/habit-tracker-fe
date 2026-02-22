@@ -8,7 +8,7 @@ const getMe = async () => {
   return res.data.data;
 };
 
-const getMeQueryKey = () => ["me"];
+export const getMeQueryKey = () => ["me"];
 
 const getMeQueryOptions = () => {
   return queryOptions({
