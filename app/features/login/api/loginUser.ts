@@ -1,5 +1,7 @@
+import { getMeQueryKey } from "@/api/getMe";
 import { axiosInstance } from "@/lib/axios";
 import type { MutationConfig } from "@/lib/query-client";
+import queryClient from "@/lib/query-client";
 import { useMutation } from "@tanstack/react-query";
 import z from "zod";
 
@@ -27,6 +29,7 @@ export const useLoginUser = (params: UseLoginUserParams = {}) => {
     mutationFn: loginUser,
     ...params.mutationConfig,
     onSuccess: (data, variables, onMutateResult, context) => {
+      queryClient.invalidateQueries({ queryKey: getMeQueryKey() });
       params.mutationConfig?.onSuccess?.(
         data,
         variables,

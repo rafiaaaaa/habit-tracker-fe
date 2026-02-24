@@ -2,7 +2,7 @@ import { axiosInstance } from "@/lib/axios";
 import type { QueryConfig } from "@/lib/query-client";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 
-const getMe = async () => {
+export const getMe = async () => {
   const res = await axiosInstance.get("/auth/me");
 
   return res.data.data;

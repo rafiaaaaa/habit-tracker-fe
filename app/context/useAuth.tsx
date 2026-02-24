@@ -1,5 +1,9 @@
 import { useGetMe } from "@/api/getMe";
+import { useLogout } from "@/api/logout";
+import queryClient from "@/lib/query-client";
 import { createContext, useContext } from "react";
+import { useNavigate } from "react-router";
+import { toast } from "sonner";
 
 export interface Subscription {
   plan: "free" | "pro";
@@ -17,18 +21,33 @@ export interface User {
 
 export interface AuthContextType {
   user: User;
+  userIsLoading: boolean;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const { data: user } = useGetMe();
+  const navigate = useNavigate();
+  const { data: user, isPending: userIsLoading } = useGetMe();
 
-  const logout = () => {};
+  const { mutate: logoutMutation, isPending: logoutIsPending } = useLogout({
+    mutationConfig: {
+      onSuccess: () => {
+        toast.success("Logged out successfully!");
+        queryClient.clear();
+        navigate("/login");
+      },
+    },
+  });
+
+  const logout = () => {
+    logoutMutation(undefined);
+  };
 
   const value = {
     user,
+    userIsLoading,
     logout,
   };
 

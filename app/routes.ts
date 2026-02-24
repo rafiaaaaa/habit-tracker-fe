@@ -11,7 +11,7 @@ export default [
   route("/register", "routes/register.tsx"),
   route("/payment/success", "routes/payment-success.tsx"),
 
-  ...prefix("dashboard", [
+  route("dashboard", "routes/dashboard-layout.tsx", [
     index("routes/dashboard.tsx"),
     route("analytics", "routes/analytics.tsx"),
   ]),
