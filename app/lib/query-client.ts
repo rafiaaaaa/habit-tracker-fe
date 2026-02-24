@@ -32,7 +32,7 @@ const queryClient = new QueryClient({
       onError: (err) => {
         if (err instanceof AxiosError) {
           return toast.error(
-            err.response?.data?.message || "Failed to create habit",
+            err.response?.data?.message || "Something went wrong",
           );
         }
 
