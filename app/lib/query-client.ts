@@ -1,5 +1,6 @@
 import { QueryClient, type UseMutationOptions } from "@tanstack/react-query";
 import { AxiosError } from "axios";
+import { toast } from "sonner";
 
 interface ApiError {
   success: boolean;
@@ -28,8 +29,14 @@ const queryClient = new QueryClient({
       refetchOnReconnect: true,
     },
     mutations: {
-      onError: () => {
-        alert("Something went wrong");
+      onError: (err) => {
+        if (err instanceof AxiosError) {
+          return toast.error(
+            err.response?.data?.message || "Failed to create habit",
+          );
+        }
+
+        return toast.error("Something went wrong");
       },
     },
   },

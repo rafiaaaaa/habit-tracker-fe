@@ -36,9 +36,6 @@ export default function Login() {
           toast.success("Welcome back!");
           navigate("/dashboard");
         },
-        onError: (err) => {
-          toast.error("Login failed" + err.message);
-        },
       },
     });
 

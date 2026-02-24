@@ -88,13 +88,7 @@ export function HabitProvider({ children }: { children: ReactNode }) {
 
   // create
   const { mutate: createHabitMutation, isPending: isCreateHabitLoading } =
-    useCreateHabit({
-      mutationConfig: {
-        onError: (err) => {
-          toast.error(err.response?.data?.message || "Failed to create habit");
-        },
-      },
-    });
+    useCreateHabit();
 
   // delete
   const { mutate: deleteHabitMutation, isPending: isDeleteHabitLoading } =
