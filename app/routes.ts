@@ -11,5 +11,8 @@ export default [
   route("/register", "routes/register.tsx"),
   route("/payment/success", "routes/payment-success.tsx"),
 
-  ...prefix("dashboard", [index("routes/dashboard.tsx")]),
+  ...prefix("dashboard", [
+    index("routes/dashboard.tsx"),
+    route("analytics", "routes/analytics.tsx"),
+  ]),
 ] satisfies RouteConfig;
