@@ -11,11 +11,7 @@ import { NavLink } from "react-router";
 import type { User } from "@/types/habit";
 import { PLAN_LIMITS } from "@/types/habit";
 import { Button } from "@/components/ui/button";
-
-interface DashboardSidebarProps {
-  user: User;
-  onLogout: () => void;
-}
+import { useAuth } from "@/context/useAuth";
 
 const navItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard", end: true },
@@ -29,9 +25,12 @@ const navItems = [
   { to: "/dashboard/settings", icon: Settings, label: "Settings" },
 ];
 
-export function DashboardSidebar({ user, onLogout }: DashboardSidebarProps) {
-  const limits = PLAN_LIMITS[user.plan];
-  const isPro = user.plan === "pro";
+export function DashboardSidebar() {
+  const { user, logout } = useAuth();
+  if (!user) return null;
+
+  const limits = PLAN_LIMITS[user.subscription?.plan];
+  const isPro = user.subscription?.plan === "pro";
 
   return (
     <aside className="w-64 h-screen glass border-r border-border flex flex-col">
@@ -94,10 +93,10 @@ export function DashboardSidebar({ user, onLogout }: DashboardSidebarProps) {
             <p className="font-medium truncate">{user.name}</p>
             <p className="text-xs text-muted-foreground flex items-center gap-1">
               {isPro && <Crown className="w-3 h-3 text-warning" />}
-              {user.plan === "pro" ? "Pro Plan" : "Free Plan"}
+              {user.subscription?.plan === "pro" ? "Pro Plan" : "Free Plan"}
             </p>
           </div>
-          <Button variant="ghost" size="icon" onClick={onLogout}>
+          <Button variant="ghost" size="icon" onClick={logout}>
             <LogOut className="w-4 h-4" />
           </Button>
         </div>
